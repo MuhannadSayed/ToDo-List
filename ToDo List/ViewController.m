@@ -13,6 +13,8 @@
 @interface ViewController () <UITableViewDelegate , UITableViewDataSource , AddItemViewControllerDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic) NSMutableArray *items;
+@property (nonatomic) NSMutableDictionary *finsihItem;
+//@property(nonatomic) NSUserDefaults *userDefaults;
 
 
 @end
@@ -21,11 +23,23 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-    self.items = @[@{@"name" : @"Call the car workshop" , @"category" : @"Home"}].mutableCopy;
     self.navigationItem.title = @"To-Do list";
-   // self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addNewItem)];
-    
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSInteger check =
+    [userDefaults integerForKey:@"olddata"];
+    if (check == 1){
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        self.items = [[NSUserDefaults standardUserDefaults ] mutableArrayValueForKey:@"my"];
+        self.finsihItem =[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"finish"];
+        
+        
+          
+        
+    }else{
+        self.items = @[@{@"name" : @"Call the car workshop" , @"category" : @"Home"}].mutableCopy;
+      
+    }
+ 
     
     
     
@@ -49,58 +63,37 @@
     }
     return cell;
 }
--(void)addNewItem{
-    
-}
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     AddItemViewController *addVC = segue.destinationViewController;
     addVC.delegate = self;
     
-    /*
-     UINavigationController *nav = segue.destinationViewController;
-     AddItemViewController *addVC = nav.viewControllers[0];
-     addVC.delegate = self;
-     */
+
 }
 
 - (void)didSaveNewTodo:(NSString *)todoText{
     NSLog(@"%@" , todoText);
     NSDictionary *item = @{@"name" : todoText,@"category" : @"Home"};
     [self.items addObject:item];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setInteger:1 forKey:@"olddata"];
+    [userDefaults setObject:self.items forKey:@"my"] ;
+    [userDefaults synchronize];
     [self.tableView reloadData];
 }
  
-
-/*
-- (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    NSString *cellId = @"ListCell";
-    ListCellTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
-    if (nil == cell){
-        cell = [[ListCellTableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
-    }
-    cell.cellLabel.text = @"Hi";
-    return cell;
-    
-}
-
-- (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 10;
-}
-
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(nonnull NSIndexPath *)indexPath{
-    NSLog (@"hello %@" , indexPath);
-    
-}
-*/
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    NSMutableDictionary *item = [self.items[indexPath.row] mutableCopy];
-    BOOL completed = [item[@"completed"] boolValue];
-    item[@"completed"] = @(!completed);
-    self.items[indexPath.row] = item;
+    self.finsihItem = [self.items[indexPath.row] mutableCopy];
+    BOOL completed = [_finsihItem[@"completed"] boolValue];
+    _finsihItem[@"completed"] = @(!completed);
+    self.items[indexPath.row] = _finsihItem;
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    cell.accessoryType = ([item[@"completed"]boolValue]) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    cell.accessoryType = ([_finsihItem[@"completed"]boolValue]) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setInteger:1 forKey:@"olddata"];
+    [userDefaults setObject:_finsihItem forKey:@"finish"] ;
+    [userDefaults synchronize];
     
 }
 @end
