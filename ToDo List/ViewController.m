@@ -41,6 +41,12 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
     NSDictionary *item = self.items[indexPath.row];
     cell.textLabel.text = item[@"name"];
+    
+    if([item[@"completed"]boolValue]){
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    }else {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
     return cell;
 }
 -(void)addNewItem{
@@ -60,6 +66,9 @@
 
 - (void)didSaveNewTodo:(NSString *)todoText{
     NSLog(@"%@" , todoText);
+    NSDictionary *item = @{@"name" : todoText,@"category" : @"Home"};
+    [self.items addObject:item];
+    [self.tableView reloadData];
 }
  
 
@@ -84,5 +93,14 @@
     
 }
 */
-
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSMutableDictionary *item = [self.items[indexPath.row] mutableCopy];
+    BOOL completed = [item[@"completed"] boolValue];
+    item[@"completed"] = @(!completed);
+    self.items[indexPath.row] = item;
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    cell.accessoryType = ([item[@"completed"]boolValue]) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+}
 @end
