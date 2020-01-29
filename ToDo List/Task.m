@@ -7,6 +7,9 @@
 //
 
 #import "Task.h"
+// TODO
+// use this class with the next version when i will integrate Firebase DB
+
 
 @implementation Task
 
